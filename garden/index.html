@@ -21,7 +21,7 @@
 	<tr>
 	<td><input type="button" class="btn btn-disabled" onclick="toggleLight()" id="btn-light" value="Свет"/></td>
 	<td><input type="button" class="btn btn-disabled" onclick="togglePump()" id= "btn-pump" value="Насос"/></td>
-	<td><input type="button" class="graybutton" id="mode_button" onclick="toggle_mode()" value="Автономный режим"/></td>
+	<td><input type="button" class="btn btn-disabled" onclick="toggleMode()" id="btn-auto" value="Автономный режим"/></td>
 	</tr>
 	</table>
 	
@@ -30,15 +30,15 @@
 	<table bgcolor=white width=100%>
 	<tr>
 	<td><div class="information">Режим работы:</div></td>
-	<td><div class="information" id="mode_string">Ручной</div></td>
+	<td><div class="information" id="str-auto"></div></td>
 	</tr>
 	<tr>
-	<td><div class="information">Влажность:</div></td>
-	<td><div class="information" id="humidity_string">0</div></td>
+	<td><div class="information">Влажность почвы:</div></td>
+	<td><div class="information" id="str-humidity"></div></td>
 	<td><div class="information">Температура:</div></td>
-	<td><div class="information" id="temperature_string">0</div></td>
+	<td><div class="information" id="str-temperature"></div></td>
 	<td><div class="information">Освещённость</div></td>
-	<td><div class="information" id="luminocity_string">0</div></td>	
+	<td><div class="information" id="str-luminosity"></div></td>	
 	</tr>
 	<tr>
 	<td><div class="information">Пауза между поливами:</div></td>

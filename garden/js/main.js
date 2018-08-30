@@ -15,10 +15,6 @@ var dataGroups = {
 	luminosity: 2
 };
 
-function toggle_mode() {
-}
-
-
 function init_graph() {
 	var groups = new vis.DataSet([
 	{id: 0, content: 'Влажность'},
@@ -34,12 +30,24 @@ function init_graph() {
 		dataAxis: { 
 			left: {
 				range: {
-					min:0, max: 1050
+					min:0, max: 100
 				}
 			}
 		}
 	};
 	var graph2d = new vis.Graph2d(container, dataset, groups, options);
+}
+
+function showStatus(type, value) {
+	switch (type) {
+		case "auto":
+			var val = ["Manual", "Auto"];
+			$("#str-"+type).text(val[value]);
+			break;
+		default:
+			$("#str-"+type).text(value);
+	}
+	
 }
 
 function setButtonState(mode, state)
@@ -79,6 +87,7 @@ function toggleCmd(cmd) {
 				if (d && d.result == 'OK') {
 					Status[cmd].state = this.success.val;
 					setButtonState(cmd, this.success.val);
+					showStatus(cmd, this.success.val);
 				}
 			};
 			data.success.val = val;
@@ -97,6 +106,10 @@ function togglePump() {
 	toggleCmd('pump');	
 }
 
+function toggleMode() {
+	toggleCmd('auto');
+}
+
 
 function onError() {
 
@@ -107,6 +120,7 @@ function onError() {
 function onGetLatest(data, s, x) {
 
 	if (data != undefined) {
+		console.log(data);
 		if (data.history != undefined) for (var type in dataGroups) {
 
 			if (data.history[type] != null) {
@@ -116,11 +130,14 @@ function onGetLatest(data, s, x) {
 					group: dataGroups[type]
 				});	
 			}
+
+			showStatus(type, data.history[type].value);
 		}	
 		if (data.status != undefined) {
 			Status = data.status;
 			for (var mode in data.status) {
 				setButtonState(mode, data.status[mode].state);
+				showStatus(mode, data.status[mode].state);
 			}
 		}	
 	}

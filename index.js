@@ -1,20 +1,22 @@
+var PROTOCOL = 'lora';
 var SRV_PORT = 8070;
-var DB_NAME = ':memory:';
+//var DB_NAME = ':memory:';
+var DB_NAME = 'smartgarden.db';
 
-var MQTT_ADDRESS = '127.0.0.1';
+var MQTT_ADDRESS = '192.168.1.85';
 var MQTT_PORT = 1883;
-var MQTT_CLIENT = 'greenhouse_srv';
+var MQTT_CLIENT = 'smartgarden_server';
 
 var APP_MODULES = [
-	'devices/lora/807B85902000021E',
-	'devices/lora/807B85902000032D',
+	'devices/'+PROTOCOL+'/807B85902000040A',
 	'devices/test'
 ];
-var GPIO_MODULE = 'devices/lora/807B85902000021C';
+var GPIO_MODULE = 'devices/'+PROTOCOL+'/807B85902000040A';
 
 var GPIO_MAP = {
 	light: {port: 17, state: -1},
-	pump: {port: 16, state: -1}
+	pump: {port: 16, state: -1},
+	auto: {port: -1, state: 0}
 };
 
 
@@ -26,9 +28,9 @@ var jsonParser = bodyParser.json();
 var sql = require('sqlite3').verbose();
 var db = new sql.Database(DB_NAME);
 db.serialize(function() {
-	db.run("CREATE TABLE temperature (time INT, value INT)");
-	db.run("CREATE TABLE humidity (time INT, value INT)");
-	db.run("CREATE TABLE luminosity (time INT, value INT)");
+	db.run("CREATE TABLE IF NOT EXISTS temperature (time INT, value INT)");
+	db.run("CREATE TABLE IF NOT EXISTS humidity (time INT, value INT)");
+	db.run("CREATE TABLE IF NOT EXISTS luminosity (time INT, value INT)");
 
 	//TODO: remove this
 	/*for (i = 0; i < 30; i++) {
@@ -65,29 +67,34 @@ function subscribeModule(topic) {
 function onMessageReceived(topic, message) {
 	//console.log('> onMessageReceived: ' + message);
 	try {
-		var m = JSON.parse(message.toString());
+		var m = message.toString().replace(/([\d]),([\s]*\])/g, '$1$2');
+		m = JSON.parse(m);
 		if (m.data !== undefined) {
 			var val = undefined;
 			var t = undefined;
 			if (m.data.adc2 !== undefined) {
 				t = 'humidity';
-				val = parseInt(m.data.adc2.toString());
+				val = Math.floor(100-(parseInt(m.data.adc2.toString())-590)/910*100);
+				if (val > 100) val = 100;
+				if (val < 0) val = 0;
 				db.run("INSERT INTO " + t + " VALUES ("+now()+", "+val+")");
 			}
 			if (m.data.adc3 !== undefined) {
 				t = 'temperature';
-				val = parseInt(m.data.adc3.toString());
+				val = Math.floor((parseInt(m.data.adc3.toString())-750)/10+21);
 				db.run("INSERT INTO " + t + " VALUES ("+now()+", "+val+")");
 			}
 			if (m.data.luminocity !== undefined) {
 				t = 'luminosity';
-				val = parseInt(m.data.luminocity.toString());
+				val = Math.floor(Math.log(parseInt(m.data.luminocity.toString())+1)*10);
 				db.run("INSERT INTO " + t + " VALUES ("+now()+", "+val+")");
 			}
 
 			if (m.data.gpios !== undefined) {
 				for(var cmd in GPIO_MAP) {
-					GPIO_MAP[cmd].state = parseInt(m.data.gpios[GPIO_MAP[cmd].port]);
+					if (GPIO_MAP[cmd].port > -1) {
+						GPIO_MAP[cmd].state = parseInt(m.data.gpios[GPIO_MAP[cmd].port]);
+					}
 				};
 			}
 		} else {
@@ -209,7 +216,14 @@ function cmd(req, res) {
 				}
 				break;
 			case "auto":
-				res.status(200).json({result:'OK'});
+				if (p.value.toString() == '1' || p.value.toString() == '0') {
+					var state = parseInt(p.value);
+					GPIO_MAP[p.command].state = state;
+					res.status(200).json({result:'OK'});
+				} else {
+					console.log('Invalid parameter');
+					res.status(404).json({error:404});
+				}
 				break;
 			default:
 				res.status(404).json({error:404});

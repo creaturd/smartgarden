@@ -1,13 +1,15 @@
-var MQTT_ADDRESS = '127.0.0.1';
+var PROTOCOL = 'lora';
+
+var MQTT_ADDRESS = '192.168.1.85';
 var MQTT_PORT = 1883;
-var MQTT_CLIENT = 'greenhouse_emul';
+var MQTT_CLIENT = 'smartgarden_emul';
 
 var EUI_ADC = "807B85902000021E";
 var EUI_LIT = "807B85902000032D";
 
 var EUI_me = "807B85902000021C";
 
-var TIMER_INTERVAL = 60000;
+var TIMER_INTERVAL = 10000;
 
 var mqtt = require('mqtt');
 var client = mqtt.connect('mqtt://'+MQTT_ADDRESS+':'+MQTT_PORT, MQTT_CLIENT);
@@ -23,7 +25,7 @@ function onMessageReceived(topic, message) {
 	var m = message.toString();
 	console.log(' > ', t, m);
 
-	if (t != "devices/lora/"+EUI_me+"/mosi/gpio") return;
+	if (t != "devices/"+PROTOCOL+"/"+EUI_me+"/mosi/gpio") return;
 
 	if (m == "get all") {
 		var data_GPIO = {
@@ -37,13 +39,13 @@ function onMessageReceived(topic, message) {
 				battery : 3300
 			}
 		};
-		client.publish("devices/lora/"+EUI_me+"/miso", JSON.stringify(data_GPIO));
+		client.publish("devices/"+PROTOCOL+"/"+EUI_me+"/miso", JSON.stringify(data_GPIO));
 	}
 		
 }
 function onConnected() {
 	setInterval(sendData, TIMER_INTERVAL);
-	client.subscribe("devices/lora/"+EUI_me+"/#");
+	client.subscribe("devices/"+PROTOCOL+"/"+EUI_me+"/#");
 }
 
 function sendData() {
@@ -73,8 +75,8 @@ function sendData() {
 	var mADC = JSON.stringify(data_ADC);
 	var mLIT = JSON.stringify(data_LIT);
 	console.log('Sending: ' + mADC + '; ' + mLIT)
-	client.publish("devices/lora/"+EUI_ADC+"/miso/adc", mADC);
-	client.publish("devices/lora/"+EUI_LIT+"/miso/opt3001", mLIT);
+	client.publish("devices/"+PROTOCOL+"/"+EUI_ADC+"/miso/adc", mADC);
+	client.publish("devices/"+PROTOCOL+"/"+EUI_LIT+"/miso/opt3001", mLIT);
 }
 
 
