@@ -193,43 +193,7 @@ $(document).ready( function() {
 
 
 
-
-
-
-
-
-var water_status=false;
-var humidity_border=750;
-var seconds=0;
-
 function control_humidity(humidity) {
-	if(mode==MANUAL)
-		return;
-	
-	if(humidity>humidity_border && water_status==false)
-	{
-		water_status=true;
-	
-		water_on();
-		setTimeout(water_off, 60000); //switch water off after 1 minute
-
-		seconds=300;
-		timerCountdown = setInterval(function() {
-			document.getElementById("next_watering").innerHTML = seconds;
-			seconds--;
-			if(seconds<=0) {
-				clearInterval(timerCountdown);
-				water_status=false;
-			}
-		}, 1000);		  			
-	}	
-	
-	if(humidity<humidity_border && water_status==true)
-	{
-		water_status=false;
-		water_off();
-		clearInterval(timerCountdown);
-	}
 
 }
 

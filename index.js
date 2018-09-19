@@ -8,8 +8,7 @@ var MQTT_PORT = 1883;
 var MQTT_CLIENT = 'smartgarden_server';
 
 var APP_MODULES = [
-	'devices/'+PROTOCOL+'/807B85902000040A',
-	'devices/test'
+	'devices/'+PROTOCOL+'/807B85902000040A'
 ];
 var GPIO_MODULE = 'devices/'+PROTOCOL+'/807B85902000040A';
 
@@ -31,14 +30,6 @@ db.serialize(function() {
 	db.run("CREATE TABLE IF NOT EXISTS temperature (time INT, value INT)");
 	db.run("CREATE TABLE IF NOT EXISTS humidity (time INT, value INT)");
 	db.run("CREATE TABLE IF NOT EXISTS luminosity (time INT, value INT)");
-
-	//TODO: remove this
-	/*for (i = 0; i < 30; i++) {
-		db.run("INSERT INTO temperature VALUES ("+now(-i)+", "+Math.floor(Math.random()*20+10)+")");
-		db.run("INSERT INTO humidity VALUES ("+now(-i)+", "+Math.floor(Math.random()*90+10)+")");
-		db.run("INSERT INTO luminosity VALUES ("+now(-i)+", "+Math.floor(Math.random()*200+300)+")");
-	}	
-	*/
 });
 
 var mqtt = require('mqtt');
@@ -173,12 +164,7 @@ function get(req, res) {
 						res.status(404).json({error:404});
 						return;
 				}
-/*
-				if (typeof p.days !== 'undefined') {
-					var from = parseInt(p.days.toString());
-					from = now(-from); //in seconds
-				}
-*/
+
 				if (typeof p.days !== 'undefined') {
 					var limit = parseInt(p.days.toString());
 				}
