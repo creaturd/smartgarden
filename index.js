@@ -3,14 +3,15 @@ var SRV_PORT = 8070;
 //var DB_NAME = ':memory:';
 var DB_NAME = 'smartgarden.db';
 
-var MQTT_ADDRESS = '192.168.1.85';
+var MQTT_ADDRESS = 'localhost';
 var MQTT_PORT = 1883;
 var MQTT_CLIENT = 'smartgarden_server';
 
 var APP_MODULES = [
-	'devices/'+PROTOCOL+'/807B85902000040A'
+	'devices/'+PROTOCOL+'/807B85902000021E',
+	'devices/'+PROTOCOL+'/807B85902000032D',
 ];
-var GPIO_MODULE = 'devices/'+PROTOCOL+'/807B85902000040A';
+var GPIO_MODULE = 'devices/'+PROTOCOL+'/807B85902000021C';
 
 var GPIO_MAP = {
 	light: {port: 17, state: -1},
@@ -65,18 +66,21 @@ function onMessageReceived(topic, message) {
 			var t = undefined;
 			if (m.data.adc2 !== undefined) {
 				t = 'humidity';
-				val = Math.floor(100-(parseInt(m.data.adc2.toString())-590)/910*100);
+				val = m.data.adc2.toString();
+				//val = Math.floor(100-(parseInt(m.data.adc2.toString())-590)/910*100);
 				if (val > 100) val = 100;
 				if (val < 0) val = 0;
 				db.run("INSERT INTO " + t + " VALUES ("+now()+", "+val+")");
 			}
 			if (m.data.adc3 !== undefined) {
 				t = 'temperature';
-				val = Math.floor((parseInt(m.data.adc3.toString())-750)/10+21);
+				val = m.data.adc3.toString();
+				//val = Math.floor((parseInt(m.data.adc3.toString())-750)/10+21);
 				db.run("INSERT INTO " + t + " VALUES ("+now()+", "+val+")");
 			}
 			if (m.data.luminocity !== undefined) {
 				t = 'luminosity';
+				//val = m.data.luminocity.toString();
 				val = Math.floor(Math.log(parseInt(m.data.luminocity.toString())+1)*10);
 				db.run("INSERT INTO " + t + " VALUES ("+now()+", "+val+")");
 			}

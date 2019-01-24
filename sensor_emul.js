@@ -1,6 +1,6 @@
 var PROTOCOL = 'lora';
 
-var MQTT_ADDRESS = '192.168.1.85';
+var MQTT_ADDRESS = 'localhost';
 var MQTT_PORT = 1883;
 var MQTT_CLIENT = 'smartgarden_emul';
 
@@ -9,7 +9,7 @@ var EUI_LIT = "807B85902000032D";
 
 var EUI_me = "807B85902000021C";
 
-var TIMER_INTERVAL = 10000;
+var TIMER_INTERVAL = 5000;
 
 var mqtt = require('mqtt');
 var client = mqtt.connect('mqtt://'+MQTT_ADDRESS+':'+MQTT_PORT, MQTT_CLIENT);
@@ -51,8 +51,8 @@ function onConnected() {
 function sendData() {
 	var data_ADC = {
 		data : {
-			adc2 : Math.floor(Math.random()*90+10),
-			adc3 : Math.floor(Math.random()*20+10)
+			adc2 : Math.floor(Math.sin(Date.now()/15000)*10+Math.sin(Date.now()/4000)*5+50),
+			adc3 : Math.floor(Math.sin(Date.now()/10000)*7+Math.sin(Date.now()/3000)*3+20)
 		},
 		status : {
 			devEUI : EUI_ADC,
@@ -63,7 +63,7 @@ function sendData() {
 	};
 	var data_LIT = {
 		data : {
-			luminocity: Math.floor(Math.random()*1000+50)
+			luminocity: Math.floor(Math.sin(Date.now()/20000)*200+Math.sin(Date.now()/5000)*50+Math.sin(Date.now()/1000)*5+500)
 		},
 		status : {
 			devEUI : EUI_LIT,

@@ -3,14 +3,15 @@ var SRV_PORT = 8070;
 //var DB_NAME = ':memory:'; // memory database
 var DB_NAME = 'smartgarden.db';
 
-var MQTT_ADDRESS = '192.168.1.85';
+var MQTT_ADDRESS = 'localhost';
 var MQTT_PORT = 1883;
 var MQTT_CLIENT = 'smartgarden_server'; // Client name must be unique in space of the MQTT broker
 
 var APP_MODULES = [
-	'devices/'+PROTOCOL+'/807B859020000100'
+	'devices/'+PROTOCOL+'/807B85902000021E',
+	'devices/'+PROTOCOL+'/807B85902000032D',
 ];
-var GPIO_MODULE = 'devices/'+PROTOCOL+'/807B859020000100'; // executive module, not has to be the same as one of APP_MODULES
+var GPIO_MODULE = 'devices/'+PROTOCOL+'/807B85902000021C'; // executive module, not has to be the same as one of APP_MODULES
 
 var GPIO_MAP = {
 	light: {port: 17, state: -1},
@@ -87,7 +88,7 @@ function onConnected() {
 
 
 // Function to get current datetime in format of UNIX timestamp.
-// If dayshift is defined, corresponding correction is applied
+// If dayshift is defined, corresponding correction is applied.
 function now(dayshift) {
 	var days = Math.floor(Date.now()/1000);
 	if (typeof dayshift === "number" || typeof dayshift === 'string') {
